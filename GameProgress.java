@@ -24,7 +24,7 @@ public class GameProgress implements Serializable {
         File fileZip = new File("Games/savegames/Save.zip");
 
         if (!fileZip.exists()) {
-            Main.newFile(fileZip.getName());
+            Main.newFile(fileZip.getPath());
         }
 
         FilenameFilter f1 = (File dir, String name) -> name.contains(".dat");
