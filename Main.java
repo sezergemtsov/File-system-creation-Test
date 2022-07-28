@@ -10,27 +10,19 @@ public class Main {
         tempCheck();
         File file = new File(path);
         if (file.mkdir()) {
-            setGoodLog(file);
+            setGoodLog(file, "create");
         } else {
-            setBadLog(file);
+            setBadLog(file, "create");
         }
     }
 
     protected static void delete(String path) {
         File file = new File(path);
-        if (path.equals("Games/temp/temp.txt")|path.equals("Games/temp")|path.equals("Games")) {
-            if (file.delete()) {
-                setGoodLog(file);
-            } else {
-                setBadLog(file);
-            }
+        tempCheck();
+        if (file.delete()) {
+            setGoodLog(file, "delete");
         } else {
-            tempCheck();
-            if (file.delete()) {
-                setGoodLog(file);
-            } else {
-                setBadLog(file);
-            }
+            setBadLog(file, "delete");
         }
     }
 
@@ -39,9 +31,9 @@ public class Main {
         File file = new File(name);
         try {
             if (file.createNewFile()) {
-                setGoodLog(file);
+                setGoodLog(file, "create");
             } else {
-                setBadLog(file);
+                setBadLog(file, "create");
             }
         } catch (IOException e) {
             System.out.println(file + " creation issue");
@@ -62,14 +54,14 @@ public class Main {
         }
     }
 
-    protected static void setGoodLog(File file) {
-        String success = getTime() + " ... " + file + " created\n";
+    protected static void setGoodLog(File file, String action) {
+        String success = getTime() + " ... " + file + " " + action + "d\n";
         byte[] bytes = success.getBytes(StandardCharsets.UTF_8);
         recordLog(bytes);
     }
 
-    protected static void setBadLog(File file) {
-        String fail = getTime() + " ... " + file + " failed to create\n";
+    protected static void setBadLog(File file, String action) {
+        String fail = getTime() + " ... " + file + " failed to " + action + "\n";
         byte[] bytes = fail.getBytes(StandardCharsets.UTF_8);
         recordLog(bytes);
     }
@@ -80,13 +72,19 @@ public class Main {
         File file2 = new File("Games");
         if (file.exists()) {
         } else if (file1.exists()) {
-            file.mkdir();
-            setGoodLog(file);
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+            }
+            setGoodLog(file, "create");
         } else if (file2.exists()) {
             file1.mkdir();
-            file.mkdir();
-            setGoodLog(file1);
-            setGoodLog(file);
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+            }
+            setGoodLog(file1, "create");
+            setGoodLog(file, "create");
         } else {
             file2.mkdir();
             file1.mkdir();
@@ -94,13 +92,16 @@ public class Main {
                 file.createNewFile();
             } catch (IOException e) {
             }
-            setGoodLog(file2);
-            setGoodLog(file1);
-            setGoodLog(file);
+            setGoodLog(file2, "create");
+            setGoodLog(file1, "create");
+            setGoodLog(file, "create");
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+
+        // Задача 1: Установка (Создаем директроии, методы в Main. Лог по директориям сохранеется в Games/temp/temp.txt)
+
         newDir("Games/src");
         newDir("Games/res");
         newDir("Games/savegames");
@@ -111,6 +112,21 @@ public class Main {
         newDir("Games/res/drawables");
         newDir("Games/res/vectors");
         newDir("Games/res/icons");
-    }
 
+        // Задача 2: Сохранение и архивирование (Создаем данные и сохраняем прогресс. Методы в GameProgress)
+
+        GameProgress player1 = new GameProgress(100, 1, 1, 0);
+        GameProgress player2 = new GameProgress(80, 3, 5, 200);
+        GameProgress player3 = new GameProgress(35, 12, 20, 1200);
+        player1.saveGame();
+        player2.saveGame();
+        player3.saveGame();
+
+        GameProgress.zipSavedGame();
+
+        // Задача 3: Загрузка (Загружает первое сохранение и выводит данные в консоль. Методы в GameProgress)
+
+        GameProgress.unZipSavedGame();
+
+    }
 }
